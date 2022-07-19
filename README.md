@@ -149,7 +149,11 @@ taxa <- addSpecies(taxa, "~/Desktop/Toadfish_workflow/silva_species_assignment_v
 taxa.print <- taxa
 ```
 
+# DATA ANALYSIS IN R USING PHYLOSEQ <a name="phyloseq"></a>
 
+#### R-markdown is recommended for code documentation
+
+## Install and Load Libraries
 
 ```{r}
 library(phyloseq); packageVersion("phyloseq")
@@ -197,6 +201,12 @@ asv_tabtax <- cbind(asv_tab,asv_tax)
 row.names(asv_tabtax) <- sub(">", "", asv_headers)
 write.table(asv_tabtax, "ASVs_counts_taxonomy.tsv", sep="\t", quote=F, col.names=NA)
 ```
+
+## Combine data into a phyloseq object <a name="create"></a>
+
+- The phyloseq package organizes and synthesizes the different data types from a typical amplicon sequencing experiment into a single data object that can be easily manipulated. The last bit of information needed is the sample data contained in a .csv file.
+
+- The full suite of data for this study – the sample-by-sequence feature table, the sample metadata, the sequence taxonomies, and the phylogenetic tree – can now be combined into a single object.
 
 ```{r}
 setwd("~/Desktop/Toadfish_workflow/analysis")
