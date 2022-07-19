@@ -178,6 +178,9 @@ library("ampvis2"); packageVersion("ampvis2")
 
 ```
 
+## Export Data to files <a name="export"></a>
+- ASV fasta
+
 ```{r}
 setwd("~/Desktop/Toadfish_workflow/analysis")
 asv_seqs <- colnames(seqtab)
@@ -187,16 +190,28 @@ for (i in 1:dim(seqtab)[2]) {
 }
 asv_fasta <- c(rbind(asv_headers, asv_seqs))
 write(asv_fasta, "ASVs.fa")
+```
 
+- Count Table (with the amount of ASVs found in each of your samples)
+
+```
 asv_tab <- t(seqtab)
 row.names(asv_tab) <- sub(">", "", asv_headers)
 
 write.table(asv_tab, "ASVs_counts.tsv", sep="\t", quote=F, col.names=NA)
 
+```
+- Taxonomy Table (with the taxonomy of all your ASVs)
+
+```
 asv_tax <- taxa
 row.names(asv_tax) <- sub(">", "", asv_headers)
 write.table(asv_tax, "ASVs_taxonomy.tsv", sep="\t", quote=F, col.names=NA)
+```
 
+- A combined table of ASVs counts and taxonomy for quick analysis (and because this is how javi's brain works...)
+
+```
 asv_tabtax <- cbind(asv_tab,asv_tax)
 row.names(asv_tabtax) <- sub(">", "", asv_headers)
 write.table(asv_tabtax, "ASVs_counts_taxonomy.tsv", sep="\t", quote=F, col.names=NA)
