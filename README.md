@@ -1,16 +1,25 @@
-# microbiome
+## Set-up <a name="Set-up"></a>
 
----
-title: "Toadsih-DADA2"
-author: "Anthony Bonacolta"
-date: "7/15/22"
-output: html_document
----
+### [Download and install conda](https://docs.conda.io/en/latest/miniconda.html)
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+Before downloading conda determine which version of python is installed in your system an proceed accordingly
+
+```
+python -V
 ```
 
+### Install cutadapt
+
+```
+conda install -c bioconda cutadapt
+```
+
+# Read Processing Pipeline <a name="Pipeline"></a>
+---
+
+## Primer removal <a name="primers"></a>
+
+### Create a list with the name of the samples
 
 ```{bash}
 ls *_L001_R1_001.fastq.gz | cut -f 1-2 -d "_" > samples
@@ -25,33 +34,56 @@ ${sample}_L001_R1_001.fastq.gz ${sample}_L001_R2_001.fastq.gz >> cutadapt_primer
 done
 ```
 
+### Check how the process went
+
 ```{bash}
 paste samples <(grep "passing" cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")") <(grep "filtered" cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")")
 ```
+## Sequence Processing with DADA2 <a name="seqs"></a>
 
+#### Load the dada2 library in R
 
 ```{r}
 library(dada2); packageVersion("dada2")
 ```
+
+#### Indicate where the data is
 
 ```{r}
 setwd("~/Desktop/Toadfish_workflow/data/BonacoltaEMPV4")
 path <- "~/Desktop/Toadfish_workflow/data/BonacoltaEMPV4" # CHANGE ME to the directory containing the fastq files after unzipping.
 list.files(path)
 ```
+### Read your fastq files
+
 ```{r}
 fnFs <- sort(list.files(path, pattern="_L001_R1_001_trimmed.fastq.gz", full.names = TRUE))
 fnRs <- sort(list.files(path, pattern="_L001_R2_001_trimmed.fastq.gz", full.names = TRUE))
 ```
 
+#### Extract sample names, assuming filenames have format: SAMPLENAME_XXX.fastq
+- This will create an object in R with your sample names to use later on.
+
 ```{r}
 sample.names <- sapply(strsplit(basename(fnFs), "_L"), `[`, 1)
 ```
+### Plot sequences quality
+- These plots will show you where the quality of our reads starts to drop off. You will use these plots to enter values in the next step.
+
 
 ```{r}
 plotQualityProfile(fnFs[2:4])
 plotQualityProfile(fnRs[2:4])
 ```
+### Filter files and place them in /filtered subdirectory
+- Judging from your plots in the previous step you will truncating your reads at the length where the quality score drops off the most; in this case its 250 for both the forward and reverse reads.
+- `trimLeft` = The number of nucleotides to remove from the start of each read. 
+- `maxN` = Default 0. After truncation, sequences with more than maxN Ns will be discarded
+- `maxEE` = The maxEE parameter sets the maximum number of “expected errors” allowed in a read.
+- `rm.phix` =  If TRUE, discard reads that match against the phiX genome, which is commonly used as a control for Illumina sequencing runs.
+- `compress` = compresses our reads on output.
+- `matchIDs` = This just ensures our forward and reverse reads are matching.
+
 
 
 ```{r}
@@ -65,7 +97,8 @@ out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, trimLeft=10, truncLen=c(250,250
               compress=TRUE, multithread=TRUE)
 head(out)
 ```
-
+### Calculate errors and error plotting
+- See how everything went
 
 ```{r}
 errF <- learnErrors(filtFs, multithread=2)
@@ -73,6 +106,9 @@ errR <- learnErrors(filtRs, multithread=2)
 plotErrors(errF, nominalQ=TRUE)
 plotErrors(errR, nominalQ=TRUE)
 ```
+
+### Infer sequence variants
+- This step is the core of DADA2 where we will be generating our ASVs.
 
 ```{r}
 derepFs <- derepFastq(filtFs)
@@ -90,6 +126,7 @@ dadaFs[[1]]
 mergers <- mergePairs(dadaFs, derepFs, dadaRs, derepRs, verbose=TRUE)
 ```
 
+### Construct sequence table and remove chimaeras
 
 ```{r}
 seqtab.all <- makeSequenceTable(mergers)
@@ -99,6 +136,11 @@ table(nchar(getSequences(seqtab))) # Inspect distribution of sequence lengths
 seqtab.chim <- getSequences(seqtab.all)[!getSequences(seqtab.all) %in% getSequences(seqtab)]
 ```
 
+### Assign taxonomy
+
+**Note:** This may take a few hours/days depending on amount of data.
+- The dada2 package implements the naive Bayesian classifier method to taxonomically classify the sequence variants. This classifier compares sequence variants to a training set of classified sequences.
+
 ```{r}
 ref_fasta <- "~/Desktop/Toadfish_workflow/silva_nr99_v138_train_set.fa.gz"
 taxa <- assignTaxonomy(seqtab, refFasta=ref_fasta, multithread=2)
@@ -106,6 +148,8 @@ colnames(taxa) <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus")
 taxa <- addSpecies(taxa, "~/Desktop/Toadfish_workflow/silva_species_assignment_v138.fa.gz")
 taxa.print <- taxa
 ```
+
+
 
 ```{r}
 library(phyloseq); packageVersion("phyloseq")
