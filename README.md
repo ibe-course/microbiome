@@ -175,6 +175,12 @@ taxa.print <- taxa
 
 ## Install and Load Libraries
 
+```
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("phyloseq", version = "3.9")
+```
+
 ```{r}
 library(phyloseq); packageVersion("phyloseq")
 library(Biostrings); packageVersion("Biostrings")
