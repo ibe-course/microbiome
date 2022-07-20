@@ -10,8 +10,16 @@ python -V
 
 ### Install cutadapt
 
+· Using conda
+
 ```
 conda install -c bioconda cutadapt
+```
+·Using pip
+
+```
+python3 -m pip install --user --upgrade cutadapt
+
 ```
 
 # Read Processing Pipeline <a name="Pipeline"></a>
