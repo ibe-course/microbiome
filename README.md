@@ -58,8 +58,8 @@ library(dada2); packageVersion("dada2")
 #### Indicate where the data is
 
 ```{r}
-setwd("~/Desktop/Toadfish_workflow/data/BonacoltaEMPV4")
-path <- "~/Desktop/Toadfish_workflow/data/BonacoltaEMPV4" # CHANGE ME to the directory containing the fastq files after unzipping.
+setwd("~/Desktop/microbiome_workflow/data/BonacoltaEMPV4")
+path <- "~/Desktop/microbiome_workflow/data/BonacoltaEMPV4" # CHANGE ME to the directory containing the fastq files after unzipping.
 list.files(path)
 ```
 ### Read your fastq files
@@ -150,10 +150,10 @@ seqtab.chim <- getSequences(seqtab.all)[!getSequences(seqtab.all) %in% getSequen
 - The dada2 package implements the naive Bayesian classifier method to taxonomically classify the sequence variants. This classifier compares sequence variants to a training set of classified sequences.
 
 ```{r}
-ref_fasta <- "~/Desktop/Toadfish_workflow/silva_nr99_v138_train_set.fa.gz"
+ref_fasta <- "~/Desktop/microbiome_workflow/silva_nr99_v138_train_set.fa.gz"
 taxa <- assignTaxonomy(seqtab, refFasta=ref_fasta, multithread=2)
 colnames(taxa) <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus")
-taxa <- addSpecies(taxa, "~/Desktop/Toadfish_workflow/silva_species_assignment_v138.fa.gz")
+taxa <- addSpecies(taxa, "~/Desktop/microbiome_workflow/silva_species_assignment_v138.fa.gz")
 taxa.print <- taxa
 ```
 
@@ -190,7 +190,7 @@ library("ampvis2"); packageVersion("ampvis2")
 - ASV fasta
 
 ```{r}
-setwd("~/Desktop/Toadfish_workflow/analysis")
+setwd("~/Desktop/microbiome_workflow/analysis")
 asv_seqs <- colnames(seqtab)
 asv_headers <- vector(dim(seqtab)[2], mode="character")
 for (i in 1:dim(seqtab)[2]) {
@@ -232,7 +232,7 @@ write.table(asv_tabtax, "ASVs_counts_taxonomy.tsv", sep="\t", quote=F, col.names
 - The full suite of data for this study – the sample-by-sequence feature table, the sample metadata, the sequence taxonomies, and the phylogenetic tree – can now be combined into a single object.
 
 ```{r}
-setwd("~/Desktop/Toadfish_workflow/analysis")
+setwd("~/Desktop/microbiome_workflow/analysis")
 SV <- read.table("ASVs_counts.tsv", row.names = 1, check.names= FALSE, sep = "\t", header = TRUE)
 tax <-as.matrix(read.table("ASVs_taxonomy.tsv", row.names = 1, header = TRUE, sep = "\t"))
 map <- read.table("toadfish_metadata.txt", row.names = 1, sep ="\t", header = TRUE)
@@ -253,7 +253,7 @@ psf_toadfish
 ```
 
 ```{r misc, include=FALSE}
-setwd("~/Desktop/Toadfish_workflow/analysis")
+setwd("~/Desktop/microbiome_workflow/analysis")
 phyla_csv <- read.csv("phyla.csv",header=F)
 phyla <- phyla_csv %>% pull(V1)
 classes_csv <- read.csv("class.csv",header=F)
@@ -288,7 +288,7 @@ p <- ggplot(type_taxa, aes(x = Sample, y = Abundance, fill = Class)) +
   ggtitle("Class Composition of Toadfish Samples") + scale_y_continuous(limits = c(0,1), expand = c(0,0)) + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + xlab("Sample")
 p
 
-pdf("~/Desktop/Toadfish_workflow/analysis/figures/ra_Class.pdf", height = 7, width=13)
+pdf("~/Desktop/microbiome_workflow/analysis/figures/ra_Class.pdf", height = 7, width=13)
 plot(p)
 dev.off()
 
@@ -309,7 +309,7 @@ p <- ggplot(type_taxa, aes(x = Sample, y = Abundance, fill = Phylum)) +
   ggtitle("Phylum Composition of Toadfish Samples") + scale_y_continuous(limits = c(0,1), expand = c(0,0)) + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + xlab("Sample")
 p
 
-pdf("~/Desktop/Toadfish_workflow/analysis/figures/ra_Phylum.pdf", height = 7, width=13)
+pdf("~/Desktop/microbiome_workflow/analysis/figures/ra_Phylum.pdf", height = 7, width=13)
 plot(p)
 dev.off()
 
@@ -329,7 +329,7 @@ p <- ggplot(type_taxa, aes(x = Sample, y = Abundance, fill = Order)) +
   ggtitle("Order Composition of Toadfish Samples") + scale_y_continuous(limits = c(0,1), expand = c(0,0)) + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + xlab("Sample")
 p
 
-pdf("~/Desktop/Toadfish_workflow/analysis/figures/ra_Order.pdf", height = 7, width=15)
+pdf("~/Desktop/microbiome_workflow/analysis/figures/ra_Order.pdf", height = 7, width=15)
 plot(p)
 dev.off()
 ```
@@ -352,7 +352,7 @@ xx <- ggplot(type_taxa, aes(x = factor(Sample, levels=c("1-9A-Ant", "26-9C-Ant",
 xx
 
 
-pdf("~/Desktop/Toadfish_workflow/analysis/figures/bub_orders.pdf", height =11, width=10)
+pdf("~/Desktop/microbiome_workflow/analysis/figures/bub_orders.pdf", height =11, width=10)
 plot(xx)
 dev.off()
 ```
@@ -375,7 +375,7 @@ xx <- ggplot(type_taxa, aes(x = factor(Sample, levels=c("1-9A-Ant", "26-9C-Ant",
 xx
 
 
-pdf("~/Desktop/Toadfish_workflow/analysis/figures/bub_class.pdf", height =7, width=10)
+pdf("~/Desktop/microbiome_workflow/analysis/figures/bub_class.pdf", height =7, width=10)
 plot(xx)
 dev.off()
 ```
@@ -398,7 +398,7 @@ xx <- ggplot(type_taxa, aes(x = factor(Sample, levels=c("QC", "9", "35", "36", "
 xx
 
 
-pdf("~/Desktop/Toadfish_workflow/analysis/figures/bub_order_treatment.pdf", height =7, width=10)
+pdf("~/Desktop/microbiome_workflow/analysis/figures/bub_order_treatment.pdf", height =7, width=10)
 plot(xx)
 dev.off()
 ```
@@ -420,7 +420,7 @@ xx <- ggplot(type_taxa, aes(x = factor(Sample, levels=c("Anterior", "Posterior",
 xx
 
 
-pdf("~/Desktop/Toadfish_workflow/analysis/figures/bub_order_location.pdf", height =7, width=10)
+pdf("~/Desktop/microbiome_workflow/analysis/figures/bub_order_location.pdf", height =7, width=10)
 plot(xx)
 dev.off()
 ```
@@ -447,7 +447,7 @@ xx <- ggplot(type_taxa["Abundance" > 0], aes(x = factor(Sample, levels=c("9Anter
   ggtitle("Prokaryotic Orders between toadfish locations & treatments")
 xx
 
-pdf("~/Desktop/Toadfish_workflow/analysis/figures/bub_order_location_treatment.pdf", height =10, width=10)
+pdf("~/Desktop/microbiome_workflow/analysis/figures/bub_order_location_treatment.pdf", height =10, width=10)
 plot(xx)
 dev.off()
 ```
@@ -462,7 +462,7 @@ PCA = plot_ordination(ps_clr, psr_clr.ord,
 
 PCA
 
-pdf("~/Desktop/Toadfish_workflow/analysis/figures/PCA_Location_Treatment.pdf",  width=10, height=6.5)
+pdf("~/Desktop/microbiome_workflow/analysis/figures/PCA_Location_Treatment.pdf",  width=10, height=6.5)
 plot(PCA)
 dev.off()
 ```
@@ -492,7 +492,7 @@ ps1.meta$Shannon <- tab$diversity_shannon # We want to look at the shannon-weine
 p1 <- ggboxplot(ps1.meta, x = "NewPastedVar", y = "Shannon",
  add = "boxplot", fill = "Location", order=c("9Anterior", "9Posterior", "9Fluid", "9Precipitates", "35Anterior", "35Posterior", "35Fluid", "35Precipitates", "60Anterior", "60Posterior", "60Fluid", "60Precipitates")) + theme_classic() + scale_fill_viridis_d()
 
-pdf("~/Desktop/Toadfish_workflow/analysis/figures/alpha.pdf",  width=12, height=5)
+pdf("~/Desktop/microbiome_workflow/analysis/figures/alpha.pdf",  width=12, height=5)
 plot(p1)
 dev.off()
 ```
