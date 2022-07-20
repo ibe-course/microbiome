@@ -49,6 +49,18 @@ paste samples <(grep "passing" cutadapt_primer_trimming_stats.txt | cut -f3 -d "
 ```
 ## Sequence Processing with DADA2 <a name="seqs"></a>
 
+#### Install Bioconductor
+
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install()
+
+#### Install dada2
+
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install (c("dada2"))
+
 #### Load the dada2 library in R
 
 ```{r}
